@@ -423,8 +423,8 @@ function buildEmailCoreTable() {
   var waNum  = '38348166151';
   var titleHTML  = mainTitle.replace(/\n/g,'<br>');
 
-  var headerInner = logoImage
-    ? '<img src="' + logoImage + '" alt="Logo" style="display:block;max-height:44px;max-width:160px;width:auto;height:auto;object-fit:contain;">'
+var headerInner = logoImage
+    ? '<img src="' + logoImage + '" alt="Logo" style="display:block;height:80px;width:auto;object-fit:contain;">'
     : '<div style="font-family:Arial,sans-serif;font-size:11px;color:#bbb;font-style:italic;">[ logo ]</div>';
 
   var monthNames = ['Janar','Shkurt','Mars','Prill','Maj','Qershor','Korrik','Gusht','Shtator','Tetor','Nentor','Dhjetor'];
@@ -434,7 +434,7 @@ function buildEmailCoreTable() {
   var offerDateShort = dp ? (dp[2] + '/' + dp[1]) : '';
   var offerDateLong  = dp ? (parseInt(dp[2],10) + ' ' + monthNames[parseInt(dp[1],10)-1] + ' ' + dp[0]) : '';
 
-  var headerRight = '<div style="font-family:Arial,sans-serif;font-size:11px;color:#999;text-align:right;">Newsletter'
+  var headerRight = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#999;text-align:right;">Newsletter'
     + (offerDateLong ? ' &middot; ' + offerDateLong : '') + '</div>';
 
   var heroRow = heroImage
@@ -486,7 +486,7 @@ function buildEmailCoreTable() {
     + '<tr><td align="center" style="padding:4px 0;"><a href="https://www.instagram.com/drinihotels" style="font-family:Arial,sans-serif;font-size:13px;color:#E1306C;text-decoration:none;">&#128247; Instagram: <strong>@drinihotels</strong></a></td></tr>'
 ;
 
-  return '<table width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:600px;width:100%;margin:0 auto;">\n'
+  return '<table width="600" cellpadding="0" cellspacing="0" border="0" align="center" class="email-container" style="max-width:600px;width:100%;margin:0 auto;">\n'
 
     // HEADER — logo left, "Newsletter · date" right
     + '<tr><td style="background:#ffffff;padding:12px 20px;border-radius:12px 12px 0 0;border-bottom:2px solid #e8e8e8;">'
@@ -543,16 +543,20 @@ function generateEmailHTML() {
     + '<meta charset="UTF-8">\n'
     + '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
     + '<title>Oferte Turistike</title>\n'
+    + '<style>\n'
+    + '  @media only screen and (max-width:620px) {\n'
+    + '    .email-container { width:100% !important; max-width:100% !important; }\n'
+    + '    .hotel-cell { display:block !important; width:100% !important; box-sizing:border-box; margin-bottom:16px; }\n'
+    + '    .hotel-spacer { display:none !important; }\n'
+    + '    .hero-img { max-height:none !important; }\n'
+    + '  }\n'
+    + '</style>\n'
     + '</head>\n'
     + '<body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,Helvetica,sans-serif;" bgcolor="#f0f2f5">\n'
     + buildEmailBodyHTML()
     + '\n</body>\n</html>';
 }
 
-// Flattens a hotel's photo + its rotated info-card into ONE image (canvas).
-// Used only for the "Kopjo" (clipboard) path: Gmail strips position:absolute
-// on paste, which would otherwise make the overlaid card fall out of the
-// photo's frame. Baking both into a single <img> sidesteps that entirely.
 function composeHotelCardFlat(h, inclusionsText) {
   return new Promise(function(resolve) {
     if (!h.image) { resolve(null); return; }
@@ -658,10 +662,10 @@ function buildInclBandSVG(h, inclusionsText) {
 function buildHotelRow(h1, h2, waNum) {
   return '<tr>'
     + buildHotelCell(h1, waNum)
-    + '<td width="12" style="min-width:12px;font-size:0;">&nbsp;</td>'
+    + '<td width="12" class="hotel-spacer" style="min-width:12px;font-size:0;">&nbsp;</td>'
     + (h2 ? buildHotelCell(h2, waNum) : '<td width="50%" valign="top" style="width:50%;"></td>')
     + '</tr>'
-    + '<tr><td colspan="3" height="16" style="font-size:0;">&nbsp;</td></tr>';
+    + '<tr><td colspan="3" height="16" style="font-size:15px;">&nbsp;</td></tr>';
 }
 
 function buildHotelCell(h, waNum) {
@@ -672,7 +676,7 @@ function buildHotelCell(h, waNum) {
   if (h.type) metaBits.push(h.type);
   if (h.roomType) metaBits.push(h.roomType);
   var metaLine = metaBits.length
-    ? '<div style="font-family:Arial,sans-serif;font-size:11px;color:#555;margin-bottom:8px;">' + metaBits.join(' &middot; ') + '</div>'
+    ? '<div style="font-family:Arial,sans-serif;font-size:15px;color:#555;margin-bottom:8px;">' + metaBits.join(' &middot; ') + '</div>'
     : '';
 
   var moreLink = h.link || 'https://www.drinihotels.com';
@@ -713,11 +717,11 @@ function buildHotelCell(h, waNum) {
     ? (h.name || '') + (h.name && h.location ? ' &mdash; ' : '') + (h.location || '')
     : '';
 
-  return '<td width="50%" valign="top" style="border:1px solid #e0e8f0;border-radius:8px;overflow:hidden;background:#ffffff;box-shadow:0 2px 8px rgba(0,61,107,.08);">'
+   return '<td width="50%" valign="top" class="hotel-cell" style="border:1px solid #e0e8f0;border-radius:8px;overflow:hidden;background:#ffffff;box-shadow:0 2px 8px rgba(0,61,107,.08);">'
     + '<table width="100%" cellpadding="0" cellspacing="0" border="0">'
     + '<tr><td style="padding:0;overflow:hidden;">' + imgBlock + '</td></tr>'
     + '<tr><td style="padding:12px 12px 6px;">'
-    + (nameHeading ? '<div style="font-family:Arial,sans-serif;font-size:14px;font-weight:bold;color:#003D6B;margin-bottom:5px;">' + nameHeading + '</div>' : '')
+    + (nameHeading ? '<div style="font-family:Arial,sans-serif;font-size:16px;font-weight:bold;color:#003D6B;margin-bottom:5px;">' + nameHeading + '</div>' : '')
     + metaLine
     + (h.price    ? '<div style="font-family:Arial,sans-serif;font-size:22px;font-weight:bold;color:#0099CC;margin-bottom:4px;">' + h.price + '</div>' : '')
     + '</td></tr>'
@@ -779,8 +783,8 @@ function finishKopjoDizajnin() {
   COPY_MODE = false;
   hotels.forEach(function(h){ delete h._copyFlatImage; });
 
-  var html = '<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">'
-    + '<tr><td align="center" style="text-align:center;">'
+ var html = '<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">'
+    + '<tr><td align="center">'
     + coreHTML
     + '</td></tr></table>';
 
