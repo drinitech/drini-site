@@ -442,36 +442,36 @@ function buildEmailCoreTable() {
     + (offerDateLong ? ' &middot; ' + offerDateLong : '') + '</div>';
 
   var heroRow = heroImage
-    ? '<tr><td style="padding:0;"><img src="' + heroImage + '" alt="" width="100%" style="display:block;width:100%;max-height:260px;object-fit:cover;"></td></tr>'
+    ? '<tr><td style="padding:0;"><img src="' + heroImage + '" alt="" width="100%" style="display:block;width:100%;max-height:380px;object-fit:cover;"></td></tr>'
     : '';
 
   var metaRow = '<tr><td align="center" style="padding-bottom:10px;">'
-    + (offerBadge ? '<span style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:.6px;color:#003D6B;text-transform:uppercase;">' + offerBadge + '</span>&nbsp;&nbsp;' : '')
-    + '<span style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:.6px;color:#e53935;text-transform:uppercase;">&#8226; Cmimet Momentale</span>'
+    + (offerBadge ? '<span style="font-family:Arial,sans-serif;font-size:15px;font-weight:bold;letter-spacing:.6px;color:#003D6B;text-transform:uppercase;">' + offerBadge + '</span>&nbsp;&nbsp;' : '')
+    + '<span style="font-family:Arial,sans-serif;font-size:15px;font-weight:bold;letter-spacing:.6px;color:#e53935;text-transform:uppercase;">&#8226; Cmimet Momentale</span>'
     + '</td></tr>';
 
   var dateBoxRow = offerDateShort
     ? '<tr><td align="center" style="padding-bottom:10px;">'
-      + '<div style="display:inline-block;border:1.5px solid #003D6B;border-radius:8px;padding:6px 16px;font-family:Arial,sans-serif;font-size:20px;font-weight:bold;color:#003D6B;letter-spacing:1px;">' + offerDateShort + '</div>'
+      + '<div style="display:inline-block;border:1.5px solid #003D6B;border-radius:8px;padding:8px 16px;font-family:Arial,sans-serif;font-size:40px;font-weight:bold;color:#003D6B;letter-spacing:1px;">' + offerDateShort + '</div>'
       + '</td></tr>'
     : '';
 
   var subtitleRow = subtitle
-    ? '<tr><td align="center" style="padding-top:2px;padding-bottom:6px;"><div style="font-family:Arial,sans-serif;font-size:12px;color:#777;letter-spacing:.4px;">' + subtitle + '</div></td></tr>'
+    ? '<tr><td align="center" style="padding-top:2px;padding-bottom:6px;"><div style="font-family:Arial,sans-serif;font-size:18px;color:#777;letter-spacing:.4px;">' + subtitle + '</div></td></tr>'
     : '';
 
   var lastMinuteRow = (offerBadge || offerDateLong)
     ? '<tr><td align="center" style="padding-bottom:6px;">'
-      + '<div style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:.6px;color:#0099CC;text-transform:uppercase;">'
-      + (offerBadge ? ' &middot; ' + offerBadge : '') + (offerDateLong ? ' &middot; ' + offerDateLong : '') + '</div>'
+      + '<div style="font-family:Arial,sans-serif;font-size:15px;font-weight:bold;letter-spacing:.6px;color:#0099CC;text-transform:uppercase;">'
+      + (offerBadge ? '' + offerBadge : '') + (offerDateLong ? ' &middot; ' + offerDateLong : '') + '</div>'
       + '</td></tr>'
     : '';
 
   var leadPriceRow = leadPrice
-    ? '<tr><td align="center" style="padding-bottom:2px;"><div style="font-family:Arial,sans-serif;font-size:19px;font-weight:bold;color:#111111;">' + leadPrice + '</div></td></tr>'
+    ? '<tr><td align="center" style="padding-bottom:2px;"><div style="font-family:Arial,sans-serif;font-size:20px;font-weight:bold;color:#111111;">' + leadPrice + '</div></td></tr>'
     : '';
   var leadSubtextRow = leadSubtext
-    ? '<tr><td align="center" style="padding-bottom:4px;"><div style="font-family:Arial,sans-serif;font-size:11px;color:#888;">' + leadSubtext + '</div></td></tr>'
+    ? '<tr><td align="center" style="padding-bottom:4px;"><div style="font-family:Arial,sans-serif;font-size:15px;color:#888;">' + leadSubtext + '</div></td></tr>'
     : '';
 
   var hotelRowsHTML = '';
@@ -490,7 +490,7 @@ function buildEmailCoreTable() {
     + '<tr><td align="center" style="padding:4px 0;"><a href="https://www.instagram.com/drinihotels" style="font-family:Arial,sans-serif;font-size:13px;color:#E1306C;text-decoration:none;">&#128247; Instagram: <strong>@drinihotels</strong></a></td></tr>'
 ;
 
-  return '<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">\n'
+  return '<table width="600" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:600px;width:100%;margin:0 auto;">\n'
 
     // HEADER — logo left, "Newsletter · date" right
     + '<tr><td style="background:#ffffff;padding:12px 20px;border-radius:12px 12px 0 0;border-bottom:2px solid #e8e8e8;">'
@@ -512,7 +512,7 @@ function buildEmailCoreTable() {
     + dateBoxRow
     + subtitleRow
     + '<tr><td align="center" style="padding-bottom:6px;">'
-    + '<div style="font-family:Arial,sans-serif;font-size:28px;font-weight:bold;color:#003D6B;line-height:1.25;">' + titleHTML + '</div>'
+    + '<div style="font-family:Arial,sans-serif;font-size:44px;font-weight:bold;color:#003D6B;line-height:1.25;">' + titleHTML + '</div>'
     + '</td></tr>'
     + lastMinuteRow
     + leadPriceRow
@@ -779,9 +779,15 @@ function kopjoDizajnin() {
 
 function finishKopjoDizajnin() {
   COPY_MODE = true;
-  var html = buildEmailCoreTable();
+  var coreHTML = buildEmailCoreTable();
   COPY_MODE = false;
   hotels.forEach(function(h){ delete h._copyFlatImage; });
+
+  var html = '<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">'
+    + '<tr><td align="center" style="text-align:center;">'
+    + coreHTML
+    + '</td></tr></table>';
+
   var container = document.createElement('div');
   container.setAttribute('contenteditable', 'true');
   container.style.cssText = 'position:fixed;left:-9999px;top:0;white-space:normal;';
@@ -811,6 +817,7 @@ function finishKopjoDizajnin() {
     fallbackKopjo(html);
   }
 }
+
 function fallbackKopjo(html) {
   var ta = document.createElement('textarea');
   ta.value = html; ta.style.cssText = 'position:fixed;opacity:0';
