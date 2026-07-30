@@ -286,6 +286,15 @@ function handleHeroFile(e) {
       var urlInp = document.getElementById('heroImageUrl');
       if (urlInp) urlInp.value = '';
       saveToStorage(); updatePreview();
+      toast('Duke ngarkuar foton...', 'info');
+      uploadToCloudinary(compressed).then(function(url) {
+        heroImage = url;
+        if (img) img.src = url;
+        saveToStorage(); updatePreview();
+        toast('&#10003; Foto e ngarkuar', 'success');
+      }).catch(function() {
+        toast('Ngarkimi i fotos deshtoi, provo perseri', 'error');
+      });
     });
   };
   reader.readAsDataURL(file);
@@ -337,6 +346,16 @@ function handleHotelFile(id, e) {
       var urlInp = document.getElementById('hurl_' + id);
       if (urlInp) urlInp.value = '';
       saveToStorage(); updatePreview();
+      toast('Duke ngarkuar foton...', 'info');
+      uploadToCloudinary(compressed).then(function(url) {
+        var h2 = hotels.find(function(h){ return h.id === id; });
+        if (h2) h2.image = url;
+        if (img) img.src = url;
+        saveToStorage(); updatePreview();
+        toast('&#10003; Foto e ngarkuar', 'success');
+      }).catch(function() {
+        toast('Ngarkimi i fotos deshtoi, provo perseri', 'error');
+      });
     });
   };
   reader.readAsDataURL(file);
