@@ -641,10 +641,59 @@ function inclusionsTextFor(h) {
   return bits.join(' | ');
 }
 
+var _measureCanvas = null;
+function measureTextWidth(text, fontSize, fontWeight) {
+  if (!_measureCanvas) _measureCanvas = document.createElement('canvas');
+  var ctx = _measureCanvas.getContext('2d');
+  ctx.font = (fontWeight ? fontWeight + ' ' : '') + fontSize + 'px Arial, Helvetica, sans-serif';
+  return ctx.measureText(text).width;
+}
+
+// Greedy word-wrap into at most 2 lines; overflow beyond that gets an ellipsis
+// so a long hotel name breaks onto a second line instead of running into the price box.
+function wrapNameText(text, maxWidth, fontSize, fontWeight) {
+  if (!text) return [];
+  if (measureTextWidth(text, fontSize, fontWeight) <= maxWidth) return [text];
+  var words = text.split(' ');
+  var lines = [];
+  var current = '';
+  var wi = 0;
+  while (wi < words.length && lines.length < 2) {
+    var test = current ? current + ' ' + words[wi] : words[wi];
+    if (!current || measureTextWidth(test, fontSize, fontWeight) <= maxWidth) {
+      current = test;
+      wi++;
+    } else {
+      lines.push(current);
+      current = '';
+    }
+  }
+  if (lines.length < 2 && current) { lines.push(current); current = ''; }
+  if (wi < words.length) {
+    var last = lines[1] || '';
+    while (last.length > 1 && measureTextWidth(last + '…', fontSize, fontWeight) > maxWidth) {
+      last = last.slice(0, -1);
+    }
+    lines[1] = last.replace(/\s+$/, '') + '…';
+  }
+  return lines;
+}
+
 function buildInclBandSVG(h, inclusionsText) {
-  var W = 292, H = 62, angleDeg = 2.5;
+  var W = 292, angleDeg = 2.5;
   var whiteW = Math.round(W * 0.68);
   var blueW = W - whiteW;
+
+  var locRaw  = (h.location || '').toUpperCase();
+  var nameRaw = (h.name || '').toUpperCase();
+  var loc = esc(locRaw);
+  var inc = esc(inclusionsText.toUpperCase());
+  var price = esc(h.price || '');
+  var priceLabel = esc((h.priceLabel || 'Per Person').toUpperCase());
+
+  var nameLines = wrapNameText(nameRaw, whiteW - 16, 11, 'bold').map(esc);
+  var extraH = nameLines.length > 1 ? 12 : 0;
+  var H = 62 + extraH;
 
   // The rotated rect's bounding box is bigger than WxH, so give the canvas
   // extra room (+padding) and center the rect in it, or the corners clip.
@@ -658,24 +707,22 @@ function buildInclBandSVG(h, inclusionsText) {
   var oy = Math.round((canvasH - H) / 2);
   var cx = canvasW / 2, cy = canvasH / 2;  // rotation center = canvas center
 
-  var loc = esc((h.location || '').toUpperCase());
-  var nm  = esc((h.name || '').toUpperCase());
-  var inc = esc(inclusionsText.toUpperCase());
-  var price = esc(h.price || '');
-  var priceLabel = esc((h.priceLabel || 'Per Person').toUpperCase());
   var nameY = oy + (loc ? 28 : 20);
+  var nameHTML = nameLines.map(function(line, i) {
+    return '<text x="' + (ox + 8) + '" y="' + (nameY + i * 11) + '" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="bold" fill="#111111">' + line + '</text>';
+  }).join('');
 
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + canvasW + '" height="' + canvasH + '" viewBox="0 0 ' + canvasW + ' ' + canvasH + '">'
     + '<g transform="rotate(-' + angleDeg + ' ' + cx + ' ' + cy + ')">'
     + '<rect x="' + ox + '" y="' + oy + '" width="' + whiteW + '" height="' + H + '" rx="7" fill="#ffffff"/>'
     + (h.price ? '<rect x="' + (ox + whiteW) + '" y="' + oy + '" width="' + blueW + '" height="' + H + '" rx="7" fill="#0099CC"/>' : '')
     + (loc ? '<text x="' + (ox + 8) + '" y="' + (oy + 15) + '" font-family="Arial,Helvetica,sans-serif" font-size="8" font-weight="bold" letter-spacing="0.4" fill="#003D6B">' + loc + '</text>' : '')
-    + (nm  ? '<text x="' + (ox + 8) + '" y="' + nameY + '" font-family="Arial,Helvetica,sans-serif" font-size="11" font-weight="bold" fill="#111111">' + nm + '</text>' : '')
-    + '<line x1="' + (ox + 8) + '" y1="' + (oy + 36) + '" x2="' + (ox + whiteW - 8) + '" y2="' + (oy + 36) + '" stroke="#eeeeee" stroke-width="1"/>'
-    + (inc ? '<text x="' + (ox + whiteW / 2) + '" y="' + (oy + 47) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6.5" fill="#888888">' + inc + '</text>' : '')
-    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 14) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7" fill="#ffffff">PREJ</text>' : '')
-    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 34) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="bold" fill="#ffffff">' + price + '</text>' : '')
-    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 47) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6" fill="#ffffff">' + priceLabel + '</text>' : '')
+    + nameHTML
+    + '<line x1="' + (ox + 8) + '" y1="' + (oy + 36 + extraH) + '" x2="' + (ox + whiteW - 8) + '" y2="' + (oy + 36 + extraH) + '" stroke="#eeeeee" stroke-width="1"/>'
+    + (inc ? '<text x="' + (ox + whiteW / 2) + '" y="' + (oy + 47 + extraH) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6.5" fill="#888888">' + inc + '</text>' : '')
+    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 14 + extraH / 2) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7" fill="#ffffff">PREJ</text>' : '')
+    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 34 + extraH / 2) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="bold" fill="#ffffff">' + price + '</text>' : '')
+    + (h.price ? '<text x="' + (ox + whiteW + blueW / 2) + '" y="' + (oy + 47 + extraH / 2) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6" fill="#ffffff">' + priceLabel + '</text>' : '')
     + '</g>'
     + '</svg>';
 
