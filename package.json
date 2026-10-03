@@ -1,0 +1,18 @@
+{
+  "name": "drini-offers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Drini Travel - Gjenerator Emailesh (static builder + Vercel Functions + Neon)",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "@vercel/blob": "^2.8.0",
+    "jose": "^6.2.12"
+  }
+}
