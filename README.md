@@ -7,7 +7,7 @@ për ruajtjen e shablloneve. Live: https://drini-offers.vercel.app
 
 ```
 index.html                     aplikacioni (forma, preview, kopjo / PDF / "Shiko si Email", shabllonet)
-api/login.js, logout.js, me.js hyrja me fjalëkalim (cookie JWT, 30 ditë)
+api/login.js, logout.js, me.js hyrja me fjalëkalim (cookie JWT, 1 vit)
 api/templates/index.js         GET lista (?q= kërkim), POST krijo
 api/templates/[id]/index.js    GET një shabllon, PUT ndrysho, DELETE fshi
 api/templates/[id]/duplicate.js POST dyfisho ("<emri> (kopje)")
@@ -61,7 +61,7 @@ Vercel → projekti → **Settings → Environment Variables** (për Production,
 | `BLOB_READ_WRITE_TOKEN` | shtohet automatikisht nga Blob store |
 
 Pas ndryshimit të variablave bëj **Redeploy**. Ndryshimi i `SESSION_SECRET` nxjerr jashtë të gjithë
-përdoruesit (duhet të hyjnë përsëri).
+përdoruesit (duhet të hyjnë përsëri). Hyrja zgjat 1 vit për çdo shfletues.
 
 ## 4. Nisja lokale
 
