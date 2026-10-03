@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { sendError } from './http.js';
 
 export const COOKIE_NAME = 'drini_session';
-const MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
+const MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 
 function secretKey() {
   const secret = process.env.SESSION_SECRET;
