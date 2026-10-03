@@ -90,11 +90,61 @@ textarea{resize:vertical;min-height:52px}
 ::-webkit-scrollbar-track{background:#f0f0f0}
 ::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px}
 
+/* TEMPLATES */
+.app-header-right{display:flex;align-items:center;gap:8px;min-width:0}
+.tpl-indicator{font-size:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:4px 12px;border-radius:20px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpl-indicator b{font-weight:700}
+.tpl-dirty{color:#ffd54f;font-weight:700;margin-left:4px}
+.header-link{background:none;border:none;color:#fff;opacity:.8;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px 6px}
+.header-link:hover{opacity:1;text-decoration:underline}
+.action-bar.tpl-bar{border-top:1px solid #dde;padding-top:9px}
+.btn-outline{background:#fff;color:#003D6B;border:1.5px solid #c5d3e3}
+.btn-outline:hover{background:#eef5fb;border-color:#0099CC}
+.btn[disabled]{opacity:.6;cursor:default}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,20,40,.5);display:none;align-items:center;justify-content:center;z-index:9000;padding:16px}
+.modal-backdrop.open{display:flex}
+.modal{background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.3);width:100%;max-width:640px;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;animation:modalIn .18s ease}
+.modal.modal-sm{max-width:380px}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal-head{background:linear-gradient(135deg,#003D6B 0%,#0099CC 100%);color:#fff;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:700;flex-shrink:0}
+.modal-close{background:none;border:none;color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:.8;padding:0 2px}
+.modal-close:hover{opacity:1}
+.modal-body{padding:14px 15px;overflow-y:auto}
+.modal-foot{padding:10px 15px;background:#f5f7fa;border-top:1px solid #e3e8ee;display:flex;justify-content:flex-end;gap:7px;flex-shrink:0}
+.modal-foot .btn{padding:8px 14px}
+.dlg-msg{font-size:13px;color:#444;line-height:1.45;margin-bottom:10px;white-space:pre-line}
+.dlg-error{color:#e53935;font-size:12px;font-weight:600;margin-top:6px;min-height:0}
+.modal input[type=password]{width:100%;padding:6px 9px;border:1.5px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit;background:#fafafa}
+.modal input[type=password]:focus{outline:none;border-color:#0099CC;background:#fff;box-shadow:0 0 0 3px rgba(0,153,204,.12)}
+
+.lib-search{margin-bottom:10px}
+.lib-list{display:flex;flex-direction:column;gap:7px}
+.lib-item{display:flex;gap:10px;align-items:center;border:1.5px solid #d0ddf0;background:#f8faff;border-radius:8px;padding:8px}
+.lib-item.current{border-color:#0099CC;background:#eef8fd}
+.lib-thumb{width:72px;height:50px;border-radius:5px;object-fit:cover;background:#003D6B;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#80d8ff;font-size:20px;border:1px solid #dde}
+.lib-info{flex:1;min-width:0}
+.lib-name{font-size:13px;font-weight:700;color:#003D6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-date{font-size:11px;color:#888;margin-top:2px}
+.lib-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.lib-actions .btn{padding:4px 8px;font-size:11px}
+.lib-state{text-align:center;color:#888;font-size:13px;padding:28px 10px}
+.lib-state.error{color:#e53935}
+.spinner{display:inline-block;width:18px;height:18px;border:2.5px solid #cde;border-top-color:#0099CC;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 @media(max-width:768px){
   body{overflow:auto}
   .main-layout{grid-template-columns:1fr;height:auto}
   .preview-panel{height:480px}
   .form-row{grid-template-columns:1fr}
+  .app-subtitle{display:none}
+  .tpl-indicator{max-width:46vw;font-size:11px;padding:3px 9px}
+  .modal-backdrop{padding:0;align-items:stretch}
+  .modal,.modal.modal-sm{max-width:none;max-height:none;height:100%;border-radius:0}
+  .modal.modal-sm{height:auto;margin-top:auto;border-radius:12px 12px 0 0}
+  .lib-actions .btn{padding:7px 10px;font-size:12px}
+  .action-bar .btn{white-space:normal;line-height:1.25}
 }
 </style>
 </head>
@@ -107,6 +157,10 @@ textarea{resize:vertical;min-height:52px}
       <div class="app-title" id="navAgencyName">Drini Travel &amp; Hotels</div>
       <div class="app-subtitle">Gjenerator Emailesh Profesional</div>
     </div>
+  </div>
+  <div class="app-header-right">
+    <div class="tpl-indicator" id="tplIndicator"></div>
+    <button class="header-link" id="logoutBtn" onclick="logout()" style="display:none">Dil</button>
   </div>
 </div>
 
@@ -180,6 +234,13 @@ textarea{resize:vertical;min-height:52px}
       <button class="btn btn-primary" onclick="openPreview()">&#128065;&#65039; Shiko si Email</button>
       <button class="btn btn-success" onclick="kopjoDizajnin()">&#128203; Kopjo</button>
     </div>
+    <div class="action-bar tpl-bar">
+      <button class="btn btn-primary" id="btnSaveNew" onclick="saveAsNewTemplate()">&#128190; Ruaj shabllonin</button>
+      <button class="btn btn-primary" id="btnSaveChanges" onclick="saveTemplateChanges()" style="display:none">&#128190; Ruaj ndryshimet</button>
+      <button class="btn btn-outline" id="btnSaveAsNew" onclick="saveAsNewTemplate()" style="display:none">Ruaj si t&euml; ri</button>
+      <button class="btn btn-gray" onclick="openLibrary()">&#128194; Shabllonet e ruajtura</button>
+      <button class="btn btn-outline" onclick="newTemplate()">+ E re</button>
+    </div>
   </div>
 
   <!-- PREVIEW PANEL -->
@@ -195,6 +256,33 @@ textarea{resize:vertical;min-height:52px}
 
 </div>
 
+<!-- TEMPLATE LIBRARY -->
+<div class="modal-backdrop" id="libModal" onclick="if(event.target===this)closeLibrary()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="libTitle">
+    <div class="modal-head"><span id="libTitle">&#128194; Shabllonet e ruajtura</span><button class="modal-close" onclick="closeLibrary()" aria-label="Mbyll">&times;</button></div>
+    <div class="modal-body">
+      <input type="text" id="libSearch" class="lib-search" placeholder="K&euml;rko sipas emrit..." oninput="debouncedLibSearch()">
+      <div id="libList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GENERIC DIALOG (prompt / confirm / password) -->
+<div class="modal-backdrop" id="dlgModal">
+  <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div class="modal-head"><span id="dlgTitle"></span><button class="modal-close" id="dlgClose" aria-label="Mbyll">&times;</button></div>
+    <form class="modal-body" id="dlgForm" autocomplete="off">
+      <div class="dlg-msg" id="dlgMsg"></div>
+      <input type="text" id="dlgInput">
+      <div class="dlg-error" id="dlgError"></div>
+    </form>
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="dlgCancel" type="button">Anulo</button>
+      <button class="btn btn-primary" id="dlgOk" type="button">OK</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 var hotels = [];
@@ -208,10 +296,26 @@ var logoImage = 'https://res.cloudinary.com/tqw6ippx/image/upload/v1785429765/gv
 var hotelIdCounter = 0;
 var previewTimer = null;
 
+var FORM_FIELDS = ['offerBadge', 'offerDate', 'mainTitle', 'subtitle', 'leadPrice', 'leadSubtext'];
+var HOTEL_FIELDS = ['name', 'location', 'type', 'price', 'image', 'roomType', 'stars', 'link', 'inclFluturimi', 'inclTransferi', 'priceLabel'];
+var currentTemplate = null;   // {id, name} of the template open for editing, or null
+var savedSnapshot = '';       // JSON of the form state as last saved/opened, for unsaved-changes checks
+var BLANK_SNAPSHOT = '';
+var isLoggedIn = false;
+
 window.addEventListener('load', function() {
-  var loaded = loadFromStorage();
-  if (!loaded) addHotel();
-  updatePreview();
+  var stored = readStorage();
+  setFormState({});
+  BLANK_SNAPSHOT = formSnapshot();
+  if (stored.state) setFormState(stored.state);
+  if (stored.template && stored.template.id) {
+    currentTemplate = { id: stored.template.id, name: stored.template.name };
+    savedSnapshot = stored.template.snapshot || BLANK_SNAPSHOT;
+  } else {
+    savedSnapshot = BLANK_SNAPSHOT;
+  }
+  saveToStorage();
+  checkSession();
 });
 
 function debouncedUpdate() {
@@ -219,41 +323,74 @@ function debouncedUpdate() {
   previewTimer = setTimeout(function(){ saveToStorage(); updatePreview(); }, 180);
 }
 
-function saveToStorage() {
-  var data = {
-    offerBadge:      gv('offerBadge'),
-    offerDate:       gv('offerDate'),
-    mainTitle:       gv('mainTitle'),
-    tagLabel:        gv('tagLabel'),
-    subtitle:        gv('subtitle'),
-    leadPrice:       gv('leadPrice'),
-    leadSubtext:     gv('leadSubtext'),
-    heroImage:       heroImage,
-  };
-  try { localStorage.setItem('drini_data', JSON.stringify(data)); } catch(e){}
+// One plain JSON object describing the whole form (also what gets saved as a template).
+function getFormState() {
+  var state = { version: 1 };
+  FORM_FIELDS.forEach(function(id){ state[id] = gv(id); });
+  state.heroImage = heroImage || null;
+  state.hotels = hotels.map(function(h) {
+    var out = {};
+    HOTEL_FIELDS.forEach(function(f){ out[f] = h[f]; });
+    return out;
+  });
+  return state;
 }
 
-function loadFromStorage() {
+// Fills the whole form from a getFormState() object, recreating the hotel cards.
+function setFormState(state) {
+  state = state || {};
+  FORM_FIELDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = typeof state[id] === 'string' ? state[id] : '';
+  });
+  heroImage = (typeof state.heroImage === 'string' && state.heroImage) ? state.heroImage : null;
+  var heroImg = document.getElementById('heroPreview');
+  if (heroImg) {
+    if (heroImage) { heroImg.src = heroImage; heroImg.style.display = 'block'; }
+    else { heroImg.removeAttribute('src'); heroImg.style.display = 'none'; }
+  }
+  document.getElementById('heroImageUrl').value = (heroImage && heroImage.indexOf('data:') !== 0) ? heroImage : '';
+
+  hotels = [];
+  (Array.isArray(state.hotels) ? state.hotels : []).forEach(function(src) {
+    var h = blankHotel();
+    HOTEL_FIELDS.forEach(function(f){ if (src && src[f] !== undefined && src[f] !== null) h[f] = src[f]; });
+    hotels.push(h);
+  });
+  if (!hotels.length) hotels.push(blankHotel());
+  renderHotels();
+  updatePreview();
+}
+
+function formSnapshot() {
+  return JSON.stringify(getFormState());
+}
+
+function isDirty() {
+  return formSnapshot() !== savedSnapshot;
+}
+
+function readStorage() {
+  var out = { state: null, template: null };
   try {
     var raw = localStorage.getItem('drini_data');
-    if (!raw) return false;
-    var d = JSON.parse(raw);
-    var set = function(id, val){ var el = document.getElementById(id); if(el && val) el.value = val; };
-    set('offerBadge',      d.offerBadge);
-    set('offerDate',       d.offerDate);
-    set('mainTitle',       d.mainTitle);
-    set('subtitle',        d.subtitle);
-    set('leadPrice',       d.leadPrice);
-    set('leadSubtext',     d.leadSubtext);
-    if (d.heroImage) {
-      heroImage = d.heroImage;
-      var img = document.getElementById('heroPreview');
-      if (img) { img.src = heroImage; img.style.display = 'block'; }
-      if (heroImage.indexOf('data:') !== 0) set('heroImageUrl', heroImage);
+    if (raw) out.state = JSON.parse(raw);
+    var tpl = localStorage.getItem('drini_template');
+    if (tpl) out.template = JSON.parse(tpl);
+  } catch(e) {}
+  return out;
+}
+
+function saveToStorage() {
+  try { localStorage.setItem('drini_data', formSnapshot()); } catch(e){}
+  try {
+    if (currentTemplate) {
+      localStorage.setItem('drini_template', JSON.stringify({ id: currentTemplate.id, name: currentTemplate.name, snapshot: savedSnapshot }));
+    } else {
+      localStorage.removeItem('drini_template');
     }
-    addHotel();
-    return true;
-  } catch(e) { return false; }
+  } catch(e){}
+  refreshTemplateUI();
 }
 
 function compressImageDataURL(dataUrl, maxWidth, quality, callback) {
@@ -274,30 +411,51 @@ function compressImageDataURL(dataUrl, maxWidth, quality, callback) {
   img.src = dataUrl;
 }
 
+// Hero photos go to /api/upload (Vercel Blob) so the form only ever keeps a public URL:
+// base64 images inside email HTML are blocked by Gmail/Outlook.
 function handleHeroFile(e) {
-  var file = e.target.files[0];
+  var input = e.target;
+  var file = input.files[0];
+  input.value = '';
   if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    compressImageDataURL(ev.target.result, 1200, 0.75, function(compressed) {
-      heroImage = compressed;
-      var img = document.getElementById('heroPreview');
-      if (img) { img.src = heroImage; img.style.display = 'block'; }
-      var urlInp = document.getElementById('heroImageUrl');
-      if (urlInp) urlInp.value = '';
-      saveToStorage(); updatePreview();
-      toast('Duke ngarkuar foton...', 'info');
-      uploadToCloudinary(compressed).then(function(url) {
-        heroImage = url;
-        if (img) img.src = url;
-        saveToStorage(); updatePreview();
-        toast('&#10003; Foto e ngarkuar', 'success');
-      }).catch(function() {
-        toast('Ngarkimi i fotos deshtoi, provo perseri', 'error');
+  if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) {
+    toast('Lejohen vetem foto JPEG, PNG ose WEBP', 'error');
+    return;
+  }
+  ensureLoggedIn().then(function(ok) {
+    if (!ok) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      compressImageDataURL(ev.target.result, 1200, 0.75, function(compressed) {
+        var img = document.getElementById('heroPreview');
+        var previous = heroImage;
+        if (img) { img.src = compressed; img.style.display = 'block'; }
+        toast('Duke ngarkuar foton...', 'info');
+        uploadHeroDataURL(compressed).then(function(url) {
+          heroImage = url;
+          if (img) img.src = url;
+          document.getElementById('heroImageUrl').value = url;
+          saveToStorage(); updatePreview();
+          toast('✓ Foto e ngarkuar', 'success');
+        }).catch(function(err) {
+          heroImage = previous;
+          if (img) {
+            if (previous) img.src = previous; else img.style.display = 'none';
+          }
+          toast((err && err.message) || 'Ngarkimi i fotos deshtoi, provo perseri', 'error');
+        });
       });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function uploadHeroDataURL(dataUrl) {
+  return fetch(dataUrl).then(function(r){ return r.blob(); }).then(function(blob) {
+    return authed(function() {
+      return apiRequest('POST', '/api/upload', blob);
     });
-  };
-  reader.readAsDataURL(file);
+  }).then(function(res){ return res.url; });
 }
 function handleHeroURL(url) {
   heroImage = url.trim() || null;
@@ -313,8 +471,11 @@ function handleHeroURL(url) {
 
 
 // HOTELS
+function blankHotel() {
+  return { id: ++hotelIdCounter, name:'', location:'', type:'', price:'€', image:null, roomType:'', stars:'', link:'', inclFluturimi:false, inclTransferi:false, priceLabel:'' };
+}
 function addHotel() {
-  hotels.push({ id: ++hotelIdCounter, name:'', location:'', type:'', price:'€', image:null, roomType:'', stars:'', link:'', inclFluturimi:false, inclTransferi:false, priceLabel:'' });
+  hotels.push(blankHotel());
   renderHotels();
   saveToStorage(); updatePreview();
 }
@@ -352,7 +513,7 @@ function handleHotelFile(id, e) {
         if (h2) h2.image = url;
         if (img) img.src = url;
         saveToStorage(); updatePreview();
-        toast('&#10003; Foto e ngarkuar', 'success');
+        toast('✓ Foto e ngarkuar', 'success');
       }).catch(function() {
         toast('Ngarkimi i fotos deshtoi, provo perseri', 'error');
       });
@@ -920,11 +1081,11 @@ function finishKopjoDizajnin() {
   document.body.removeChild(container);
 
   if (copied) {
-    toast('&#10003; Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V', 'success');
+    toast('✓ Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V', 'success');
   } else if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
     var blob = new Blob([html], {type:'text/html'});
     navigator.clipboard.write([new ClipboardItem({'text/html':blob})])
-      .then(function(){ toast('&#10003; Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V','success'); })
+      .then(function(){ toast('✓ Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V','success'); })
       .catch(function(){ fallbackKopjo(html); });
   } else {
     fallbackKopjo(html);
@@ -936,7 +1097,7 @@ function fallbackKopjo(html) {
   ta.value = html; ta.style.cssText = 'position:fixed;opacity:0';
   document.body.appendChild(ta); ta.focus(); ta.select();
   document.execCommand('copy'); document.body.removeChild(ta);
-  toast('&#10003; Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V','success');
+  toast('✓ Dizajni u kopjua! Shko te Gmail dhe bej Ctrl+V','success');
 }
 
 function openPreview() {
@@ -967,6 +1128,437 @@ function downloadPDF() {
       win.print();
     }, 800);
   };
+}
+
+// API + AUTH
+// body: plain object (sent as JSON), Blob (sent raw with its type), or undefined.
+function apiRequest(method, path, body) {
+  var opts = { method: method, credentials: 'same-origin', headers: {} };
+  if (body instanceof Blob) {
+    opts.headers['Content-Type'] = body.type || 'application/octet-stream';
+    opts.body = body;
+  } else if (body !== undefined) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  return fetch(path, opts).catch(function() {
+    throw new Error('Nuk ka lidhje me serverin. Kontrollo internetin.');
+  }).then(function(r) {
+    return r.json().catch(function(){ return {}; }).then(function(data) {
+      if (r.status === 401 && path !== '/api/login') setLoggedIn(false);
+      if (!r.ok) {
+        var err = new Error(data.error || ('Gabim ne server (' + r.status + ')'));
+        err.status = r.status;
+        throw err;
+      }
+      return data;
+    });
+  });
+}
+
+function setLoggedIn(v) {
+  isLoggedIn = v;
+  document.getElementById('logoutBtn').style.display = v ? '' : 'none';
+}
+
+function checkSession() {
+  apiRequest('GET', '/api/me').then(function(d){ setLoggedIn(!!d.loggedIn); }).catch(function(){ setLoggedIn(false); });
+}
+
+// Resolves true once logged in (asking for the password if needed), false if the user cancels.
+function ensureLoggedIn() {
+  if (isLoggedIn) return Promise.resolve(true);
+  return showDialog({
+    title: '🔒 Hyrje',
+    message: 'Shkruaj fjalekalimin e stafit per te ruajtur dhe hapur shabllonet.',
+    input: { type: 'password', placeholder: 'Fjalekalimi' },
+    okText: 'Hyr',
+    onOk: function(password) {
+      if (!password) throw new Error('Shkruaj fjalekalimin.');
+      return apiRequest('POST', '/api/login', { password: password });
+    }
+  }).then(function(res) {
+    if (res === null) return false;
+    setLoggedIn(true);
+    return true;
+  });
+}
+
+// Runs fn() with a session; if the session expired meanwhile, asks for the password once and retries.
+function authed(fn) {
+  return ensureLoggedIn().then(function(ok) {
+    if (!ok) throw cancelled();
+    return fn().catch(function(err) {
+      if (err.status !== 401) throw err;
+      return ensureLoggedIn().then(function(ok2) {
+        if (!ok2) throw cancelled();
+        return fn();
+      });
+    });
+  });
+}
+
+function cancelled() { var e = new Error('cancelled'); e.cancelled = true; return e; }
+
+function reportError(err) {
+  if (err && err.cancelled) return;
+  toast((err && err.message) || 'Ndodhi nje gabim', 'error');
+}
+
+function logout() {
+  apiRequest('POST', '/api/logout').catch(function(){}).then(function() {
+    setLoggedIn(false);
+    toast('Dole nga llogaria', 'info');
+  });
+}
+
+// DIALOG
+// opts: {title, message, input:{type,value,placeholder,maxLength}, okText, cancelText, danger, onOk(value)}
+// Resolves with onOk's result (or the input value / true), or null when cancelled.
+// If onOk throws/rejects, the message is shown inside the dialog and it stays open.
+var dialogBusy = false;
+function showDialog(opts) {
+  return new Promise(function(resolve) {
+    var modal = document.getElementById('dlgModal');
+    var input = document.getElementById('dlgInput');
+    var okBtn = document.getElementById('dlgOk');
+    var errEl = document.getElementById('dlgError');
+    var form = document.getElementById('dlgForm');
+    document.getElementById('dlgTitle').textContent = opts.title || '';
+    document.getElementById('dlgMsg').textContent = opts.message || '';
+    document.getElementById('dlgMsg').style.display = opts.message ? '' : 'none';
+    document.getElementById('dlgCancel').textContent = opts.cancelText || 'Anulo';
+    okBtn.textContent = opts.okText || 'OK';
+    okBtn.className = 'btn ' + (opts.danger ? 'btn-danger' : 'btn-primary');
+    okBtn.disabled = false;
+    errEl.textContent = '';
+    if (opts.input) {
+      input.style.display = '';
+      input.type = opts.input.type || 'text';
+      input.value = opts.input.value || '';
+      input.placeholder = opts.input.placeholder || '';
+      input.maxLength = opts.input.maxLength || 524288;
+    } else {
+      input.style.display = 'none';
+    }
+    modal.classList.add('open');
+    setTimeout(function(){ (opts.input ? input : okBtn).focus(); if (opts.input) input.select(); }, 30);
+
+    function close(result) {
+      modal.classList.remove('open');
+      document.removeEventListener('keydown', onKey, true);
+      form.onsubmit = okBtn.onclick = null;
+      document.getElementById('dlgCancel').onclick = document.getElementById('dlgClose').onclick = modal.onclick = null;
+      resolve(result);
+    }
+    function submit(e) {
+      if (e) e.preventDefault();
+      if (dialogBusy) return;
+      var value = opts.input ? input.value.trim() : true;
+      errEl.textContent = '';
+      dialogBusy = true; okBtn.disabled = true;
+      Promise.resolve().then(function(){ return opts.onOk ? opts.onOk(value) : value; })
+        .then(function(res){ dialogBusy = false; close(res === undefined ? value : res); })
+        .catch(function(err){
+          dialogBusy = false; okBtn.disabled = false;
+          errEl.textContent = (err && err.message) || 'Gabim';
+          if (opts.input) input.focus();
+        });
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); if (!dialogBusy) close(null); }
+      else if (e.key === 'Enter' && !opts.input && document.activeElement !== document.getElementById('dlgCancel')) { e.preventDefault(); submit(); }
+    }
+    form.onsubmit = submit;
+    okBtn.onclick = submit;
+    document.getElementById('dlgCancel').onclick = document.getElementById('dlgClose').onclick = function(){ if (!dialogBusy) close(null); };
+    modal.onclick = function(e){ if (e.target === modal && !dialogBusy) close(null); };
+    document.addEventListener('keydown', onKey, true);
+  });
+}
+
+function confirmDiscardChanges() {
+  if (!isDirty()) return Promise.resolve(true);
+  return showDialog({
+    title: 'Ndryshime te paruajtura',
+    message: 'Ke ndryshime qe nuk jane ruajtur' + (currentTemplate ? ' ne "' + currentTemplate.name + '"' : '') + '.\nDo te vazhdosh pa i ruajtur?',
+    okText: 'Vazhdo pa ruajtur',
+    danger: true
+  }).then(function(r){ return r !== null; });
+}
+
+// TEMPLATES
+function refreshTemplateUI() {
+  var ind = document.getElementById('tplIndicator');
+  if (!ind) return;
+  var dirty = isDirty();
+  if (currentTemplate) {
+    ind.innerHTML = 'Duke ndryshuar: <b></b>' + (dirty ? '<span class="tpl-dirty" title="Ndryshime te paruajtura">●</span>' : '');
+    ind.querySelector('b').textContent = currentTemplate.name;
+    ind.title = currentTemplate.name;
+  } else {
+    ind.innerHTML = 'Shabllon i ri' + (dirty ? '<span class="tpl-dirty" title="I paruajtur">●</span>' : '');
+    ind.title = '';
+  }
+  document.getElementById('btnSaveNew').style.display = currentTemplate ? 'none' : '';
+  document.getElementById('btnSaveChanges').style.display = currentTemplate ? '' : 'none';
+  document.getElementById('btnSaveAsNew').style.display = currentTemplate ? '' : 'none';
+}
+
+function markSaved(template) {
+  currentTemplate = template ? { id: template.id, name: template.name } : null;
+  savedSnapshot = formSnapshot();
+  saveToStorage();
+}
+
+// Templates must never contain base64 images: upload any leftovers before saving.
+function ensureHostedImages() {
+  var jobs = [];
+  if (heroImage && heroImage.indexOf('data:') === 0) {
+    jobs.push(uploadHeroDataURL(heroImage).then(function(url) {
+      heroImage = url;
+      document.getElementById('heroImageUrl').value = url;
+      document.getElementById('heroPreview').src = url;
+    }));
+  }
+  hotels.forEach(function(h) {
+    if (h.image && h.image.indexOf('data:') === 0) {
+      jobs.push(uploadToCloudinary(h.image).then(function(url) {
+        h.image = url;
+        var img = document.getElementById('hp_' + h.id);
+        if (img) img.src = url;
+      }));
+    }
+  });
+  return Promise.all(jobs).then(function() {
+    if (jobs.length) { saveToStorage(); updatePreview(); }
+  });
+}
+
+function suggestedName() {
+  var t = gv('mainTitle').split('\n')[0].trim();
+  var s = gv('subtitle').trim();
+  return (t + (t && s ? ' - ' : '') + s).slice(0, 120);
+}
+
+var saving = false;
+function withSaving(p) {
+  saving = true;
+  return p.then(function(v){ saving = false; return v; }, function(e){ saving = false; throw e; });
+}
+
+function saveAsNewTemplate() {
+  if (saving) return;
+  ensureLoggedIn().then(function(ok) {
+    if (!ok) return;
+    return showDialog({
+      title: '💾 Ruaj shabllonin',
+      message: 'Emri i shabllonit:',
+      input: { value: suggestedName(), placeholder: 'p.sh. Antalya Qershor', maxLength: 120 },
+      okText: 'Ruaj',
+      onOk: function(name) {
+        if (!name) throw new Error('Shkruaj nje emer.');
+        return name;
+      }
+    }).then(function(name) {
+      if (name === null) return;
+      return withSaving(ensureHostedImages().then(function() {
+        return authed(function(){ return apiRequest('POST', '/api/templates', { name: name, data: getFormState() }); });
+      })).then(function(res) {
+        markSaved(res.template);
+        toast('Shablloni u ruajt', 'success');
+      });
+    });
+  }).catch(reportError);
+}
+
+function saveTemplateChanges() {
+  if (saving || !currentTemplate) return;
+  var tpl = currentTemplate;
+  withSaving(ensureHostedImages().then(function() {
+    return authed(function(){ return apiRequest('PUT', '/api/templates/' + tpl.id, { name: tpl.name, data: getFormState() }); });
+  })).then(function(res) {
+    markSaved(res.template);
+    toast('Ndryshimet u ruajtën', 'success');
+  }).catch(function(err) {
+    if (err.status === 404) {
+      // Deleted elsewhere: keep the content, but the next save creates a new template.
+      currentTemplate = null;
+      savedSnapshot = BLANK_SNAPSHOT;
+      saveToStorage();
+      toast('Ky shabllon nuk ekziston me. Ruaje si te ri.', 'error');
+      return;
+    }
+    reportError(err);
+  });
+}
+
+function newTemplate() {
+  confirmDiscardChanges().then(function(ok) {
+    if (!ok) return;
+    setFormState({});
+    currentTemplate = null;
+    savedSnapshot = BLANK_SNAPSHOT;
+    saveToStorage();
+    toast('Formular i ri', 'info');
+  });
+}
+
+// LIBRARY
+var libTemplates = [];
+var libSearchTimer = null;
+var libRequestSeq = 0;
+
+function openLibrary() {
+  ensureLoggedIn().then(function(ok) {
+    if (!ok) return;
+    document.getElementById('libModal').classList.add('open');
+    document.addEventListener('keydown', libKeyHandler);
+    var search = document.getElementById('libSearch');
+    search.value = '';
+    loadLibrary();
+    if (window.innerWidth > 768) setTimeout(function(){ search.focus(); }, 30);
+  });
+}
+
+function closeLibrary() {
+  document.getElementById('libModal').classList.remove('open');
+  document.removeEventListener('keydown', libKeyHandler);
+}
+
+function libKeyHandler(e) {
+  if (e.key === 'Escape' && !document.getElementById('dlgModal').classList.contains('open')) closeLibrary();
+}
+
+function debouncedLibSearch() {
+  clearTimeout(libSearchTimer);
+  libSearchTimer = setTimeout(loadLibrary, 300);
+}
+
+function setLibState(html, cls) {
+  document.getElementById('libList').innerHTML = '<div class="lib-state ' + (cls || '') + '">' + html + '</div>';
+}
+
+function loadLibrary() {
+  var q = document.getElementById('libSearch').value.trim();
+  var seq = ++libRequestSeq;
+  setLibState('<span class="spinner"></span>Duke ngarkuar...');
+  authed(function() {
+    return apiRequest('GET', '/api/templates' + (q ? '?q=' + encodeURIComponent(q) : ''));
+  }).then(function(res) {
+    if (seq !== libRequestSeq) return;
+    libTemplates = res.templates || [];
+    renderLibrary(q);
+  }).catch(function(err) {
+    if (seq !== libRequestSeq) return;
+    if (err.cancelled) { closeLibrary(); return; }
+    setLibState(esc(err.message || 'Gabim') + '<br><button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="loadLibrary()">Provo perseri</button>', 'error');
+  });
+}
+
+function formatDate(iso) {
+  var d = new Date(iso);
+  if (isNaN(d)) return '';
+  function p(n){ return (n < 10 ? '0' : '') + n; }
+  return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear();
+}
+
+function renderLibrary(q) {
+  if (!libTemplates.length) {
+    setLibState(q ? 'Asnje shabllon nuk perputhet me "' + esc(q) + '".' : 'Ende nuk ke shabllone të ruajtura.');
+    return;
+  }
+  document.getElementById('libList').innerHTML = '<div class="lib-list">' + libTemplates.map(function(t) {
+    var isCurrent = currentTemplate && currentTemplate.id === t.id;
+    var thumb = t.hero_image_url
+      ? '<img class="lib-thumb" src="' + esc(t.hero_image_url) + '" alt="" loading="lazy">'
+      : '<div class="lib-thumb">&#9992;&#65039;</div>';
+    var id = esc(t.id);
+    return '<div class="lib-item' + (isCurrent ? ' current' : '') + '">'
+      + thumb
+      + '<div class="lib-info">'
+      + '<div class="lib-name" title="' + esc(t.name) + '">' + esc(t.name) + (isCurrent ? ' <span style="color:#0099CC;font-weight:600;font-size:11px">(hapur)</span>' : '') + '</div>'
+      + '<div class="lib-date">Ndryshuar: ' + formatDate(t.updated_at) + '</div>'
+      + '<div class="lib-actions">'
+      + '<button class="btn btn-primary" onclick="openTemplate(\'' + id + '\', false)">Hap</button>'
+      + '<button class="btn btn-outline" onclick="openTemplate(\'' + id + '\', true)">Përdor si të re</button>'
+      + '<button class="btn btn-outline" onclick="duplicateTemplate(\'' + id + '\')">Dupliko</button>'
+      + '<button class="btn btn-outline" onclick="renameTemplate(\'' + id + '\')">Riemërto</button>'
+      + '<button class="btn btn-danger" onclick="deleteTemplate(\'' + id + '\')">Fshi</button>'
+      + '</div></div></div>';
+  }).join('') + '</div>';
+}
+
+function findLibTemplate(id) {
+  return libTemplates.find(function(t){ return t.id === id; });
+}
+
+// asNew = "Përdor si të re": load the content but forget the id, so saving creates a new template.
+function openTemplate(id, asNew) {
+  confirmDiscardChanges().then(function(ok) {
+    if (!ok) return;
+    toast('Duke hapur...', 'info');
+    return authed(function(){ return apiRequest('GET', '/api/templates/' + id); }).then(function(res) {
+      var t = res.template;
+      setFormState(t.data);
+      markSaved(asNew ? null : t);
+      closeLibrary();
+      toast(asNew ? 'Përmbajtja u ngarkua si shabllon i ri' : 'U hap: ' + t.name, 'success');
+    });
+  }).catch(reportError);
+}
+
+function duplicateTemplate(id) {
+  authed(function(){ return apiRequest('POST', '/api/templates/' + id + '/duplicate'); }).then(function() {
+    toast('Shablloni u dyfishua', 'success');
+    loadLibrary();
+  }).catch(reportError);
+}
+
+function renameTemplate(id) {
+  var t = findLibTemplate(id);
+  if (!t) return;
+  showDialog({
+    title: 'Riemërto shabllonin',
+    input: { value: t.name, maxLength: 120 },
+    okText: 'Ruaj',
+    onOk: function(name) {
+      if (!name) throw new Error('Shkruaj nje emer.');
+      return authed(function(){ return apiRequest('PUT', '/api/templates/' + id, { name: name }); });
+    }
+  }).then(function(res) {
+    if (res === null) return;
+    if (currentTemplate && currentTemplate.id === id) {
+      currentTemplate.name = res.template.name;
+      saveToStorage();
+    }
+    toast('Emri u ndryshua', 'success');
+    loadLibrary();
+  }).catch(reportError);
+}
+
+function deleteTemplate(id) {
+  var t = findLibTemplate(id);
+  if (!t) return;
+  showDialog({
+    title: 'Fshi shabllonin',
+    message: 'A je i sigurt qe do ta fshish "' + t.name + '"?\nKjo nuk mund te kthehet mbrapsht.',
+    okText: 'Fshi',
+    danger: true,
+    onOk: function() {
+      return authed(function(){ return apiRequest('DELETE', '/api/templates/' + id); });
+    }
+  }).then(function(res) {
+    if (res === null) return;
+    if (currentTemplate && currentTemplate.id === id) {
+      // The form keeps its content but is now an unsaved new template.
+      currentTemplate = null;
+      savedSnapshot = BLANK_SNAPSHOT;
+      saveToStorage();
+    }
+    toast('Shablloni u fshi', 'success');
+    loadLibrary();
+  }).catch(reportError);
 }
 
 // TOAST
