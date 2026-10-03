@@ -7,7 +7,6 @@ për ruajtjen e shablloneve. Live: https://drini-offers.vercel.app
 
 ```
 index.html                     aplikacioni (forma, preview, kopjo / PDF / "Shiko si Email", shabllonet)
-api/login.js, logout.js, me.js hyrja me fjalëkalim (cookie JWT, 1 vit)
 api/templates/index.js         GET lista (?q= kërkim), POST krijo
 api/templates/[id]/index.js    GET një shabllon, PUT ndrysho, DELETE fshi
 api/templates/[id]/duplicate.js POST dyfisho ("<emri> (kopje)")
@@ -27,8 +26,7 @@ db/schema.sql                  tabela `templates`
    - **Dupliko**, **Riemërto**, **Fshi**.
 4. **+ E re** pastron formularin. Nëse ke ndryshime të paruajtura, aplikacioni të pyet më parë.
 
-Pa hyrje, ndërtuesi punon si më parë (lokalisht). Ruajtja, shabllonet dhe ngarkimi i fotos hero
-kërkojnë fjalëkalimin e stafit.
+Nuk ka fjalëkalim: kushdo që e ka linkun e faqes mund t'i shohë, ndryshojë dhe fshijë shabllonet.
 
 ## 1. Krijo databazën Neon
 
@@ -56,12 +54,9 @@ Vercel → projekti → **Settings → Environment Variables** (për Production,
 | Variabla | Vlera |
 |---|---|
 | `DATABASE_URL` | connection string nga Neon |
-| `APP_PASSWORD` | fjalëkalimi i përbashkët i stafit |
-| `SESSION_SECRET` | sekret i gjatë i rastësishëm, p.sh. `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
 | `BLOB_READ_WRITE_TOKEN` | shtohet automatikisht nga Blob store |
 
-Pas ndryshimit të variablave bëj **Redeploy**. Ndryshimi i `SESSION_SECRET` nxjerr jashtë të gjithë
-përdoruesit (duhet të hyjnë përsëri). Hyrja zgjat 1 vit për çdo shfletues.
+Pas ndryshimit të variablave bëj **Redeploy**.
 
 ## 4. Nisja lokale
 
@@ -82,4 +77,3 @@ Hap http://localhost:3000. Skedari `.env` nuk futet kurrë në git (është në 
 - Fotot e hoteleve dhe kartat për "Kopjo" ngarkohen ende në Cloudinary, si më parë.
 - Kufiri i Vercel për trupin e kërkesës është ~4.5 MB. Prandaj aplikacioni e kompreson foton
   (1200px, JPEG) para ngarkimit.
-- Pas 10 tentimeve të gabuara, hyrja bllokohet për 15 minuta. Çdo tentim i gabuar ka 1 sekondë vonesë.

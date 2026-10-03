@@ -95,8 +95,6 @@ textarea{resize:vertical;min-height:52px}
 .tpl-indicator{font-size:12px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:4px 12px;border-radius:20px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tpl-indicator b{font-weight:700}
 .tpl-dirty{color:#ffd54f;font-weight:700;margin-left:4px}
-.header-link{background:none;border:none;color:#fff;opacity:.8;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;padding:4px 6px}
-.header-link:hover{opacity:1;text-decoration:underline}
 .action-bar.tpl-bar{border-top:1px solid #dde;padding-top:9px}
 .btn-outline{background:#fff;color:#003D6B;border:1.5px solid #c5d3e3}
 .btn-outline:hover{background:#eef5fb;border-color:#0099CC}
@@ -115,8 +113,6 @@ textarea{resize:vertical;min-height:52px}
 .modal-foot .btn{padding:8px 14px}
 .dlg-msg{font-size:13px;color:#444;line-height:1.45;margin-bottom:10px;white-space:pre-line}
 .dlg-error{color:#e53935;font-size:12px;font-weight:600;margin-top:6px;min-height:0}
-.modal input[type=password]{width:100%;padding:6px 9px;border:1.5px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit;background:#fafafa}
-.modal input[type=password]:focus{outline:none;border-color:#0099CC;background:#fff;box-shadow:0 0 0 3px rgba(0,153,204,.12)}
 
 .lib-search{margin-bottom:10px}
 .lib-list{display:flex;flex-direction:column;gap:7px}
@@ -160,7 +156,6 @@ textarea{resize:vertical;min-height:52px}
   </div>
   <div class="app-header-right">
     <div class="tpl-indicator" id="tplIndicator"></div>
-    <button class="header-link" id="logoutBtn" onclick="logout()" style="display:none">Dil</button>
   </div>
 </div>
 
@@ -301,7 +296,6 @@ var HOTEL_FIELDS = ['name', 'location', 'type', 'price', 'image', 'roomType', 's
 var currentTemplate = null;   // {id, name} of the template open for editing, or null
 var savedSnapshot = '';       // JSON of the form state as last saved/opened, for unsaved-changes checks
 var BLANK_SNAPSHOT = '';
-var isLoggedIn = false;
 
 window.addEventListener('load', function() {
   var stored = readStorage();
@@ -315,7 +309,6 @@ window.addEventListener('load', function() {
     savedSnapshot = BLANK_SNAPSHOT;
   }
   saveToStorage();
-  checkSession();
 });
 
 function debouncedUpdate() {
@@ -422,39 +415,34 @@ function handleHeroFile(e) {
     toast('Lejohen vetem foto JPEG, PNG ose WEBP', 'error');
     return;
   }
-  ensureLoggedIn().then(function(ok) {
-    if (!ok) return;
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      compressImageDataURL(ev.target.result, 1200, 0.75, function(compressed) {
-        var img = document.getElementById('heroPreview');
-        var previous = heroImage;
-        if (img) { img.src = compressed; img.style.display = 'block'; }
-        toast('Duke ngarkuar foton...', 'info');
-        uploadHeroDataURL(compressed).then(function(url) {
-          heroImage = url;
-          if (img) img.src = url;
-          document.getElementById('heroImageUrl').value = url;
-          saveToStorage(); updatePreview();
-          toast('✓ Foto e ngarkuar', 'success');
-        }).catch(function(err) {
-          heroImage = previous;
-          if (img) {
-            if (previous) img.src = previous; else img.style.display = 'none';
-          }
-          toast((err && err.message) || 'Ngarkimi i fotos deshtoi, provo perseri', 'error');
-        });
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    compressImageDataURL(ev.target.result, 1200, 0.75, function(compressed) {
+      var img = document.getElementById('heroPreview');
+      var previous = heroImage;
+      if (img) { img.src = compressed; img.style.display = 'block'; }
+      toast('Duke ngarkuar foton...', 'info');
+      uploadHeroDataURL(compressed).then(function(url) {
+        heroImage = url;
+        if (img) img.src = url;
+        document.getElementById('heroImageUrl').value = url;
+        saveToStorage(); updatePreview();
+        toast('✓ Foto e ngarkuar', 'success');
+      }).catch(function(err) {
+        heroImage = previous;
+        if (img) {
+          if (previous) img.src = previous; else img.style.display = 'none';
+        }
+        toast((err && err.message) || 'Ngarkimi i fotos deshtoi, provo perseri', 'error');
       });
-    };
-    reader.readAsDataURL(file);
-  });
+    });
+  };
+  reader.readAsDataURL(file);
 }
 
 function uploadHeroDataURL(dataUrl) {
   return fetch(dataUrl).then(function(r){ return r.blob(); }).then(function(blob) {
-    return authed(function() {
-      return apiRequest('POST', '/api/upload', blob);
-    });
+    return apiRequest('POST', '/api/upload', blob);
   }).then(function(res){ return res.url; });
 }
 function handleHeroURL(url) {
@@ -1130,7 +1118,7 @@ function downloadPDF() {
   };
 }
 
-// API + AUTH
+// API
 // body: plain object (sent as JSON), Blob (sent raw with its type), or undefined.
 function apiRequest(method, path, body) {
   var opts = { method: method, credentials: 'same-origin', headers: {} };
@@ -1145,7 +1133,6 @@ function apiRequest(method, path, body) {
     throw new Error('Nuk ka lidhje me serverin. Kontrollo internetin.');
   }).then(function(r) {
     return r.json().catch(function(){ return {}; }).then(function(data) {
-      if (r.status === 401 && path !== '/api/login') setLoggedIn(false);
       if (!r.ok) {
         var err = new Error(data.error || ('Gabim ne server (' + r.status + ')'));
         err.status = r.status;
@@ -1156,60 +1143,8 @@ function apiRequest(method, path, body) {
   });
 }
 
-function setLoggedIn(v) {
-  isLoggedIn = v;
-  document.getElementById('logoutBtn').style.display = v ? '' : 'none';
-}
-
-function checkSession() {
-  apiRequest('GET', '/api/me').then(function(d){ setLoggedIn(!!d.loggedIn); }).catch(function(){ setLoggedIn(false); });
-}
-
-// Resolves true once logged in (asking for the password if needed), false if the user cancels.
-function ensureLoggedIn() {
-  if (isLoggedIn) return Promise.resolve(true);
-  return showDialog({
-    title: '🔒 Hyrje',
-    message: 'Shkruaj fjalekalimin e stafit per te ruajtur dhe hapur shabllonet.',
-    input: { type: 'password', placeholder: 'Fjalekalimi' },
-    okText: 'Hyr',
-    onOk: function(password) {
-      if (!password) throw new Error('Shkruaj fjalekalimin.');
-      return apiRequest('POST', '/api/login', { password: password });
-    }
-  }).then(function(res) {
-    if (res === null) return false;
-    setLoggedIn(true);
-    return true;
-  });
-}
-
-// Runs fn() with a session; if the session expired meanwhile, asks for the password once and retries.
-function authed(fn) {
-  return ensureLoggedIn().then(function(ok) {
-    if (!ok) throw cancelled();
-    return fn().catch(function(err) {
-      if (err.status !== 401) throw err;
-      return ensureLoggedIn().then(function(ok2) {
-        if (!ok2) throw cancelled();
-        return fn();
-      });
-    });
-  });
-}
-
-function cancelled() { var e = new Error('cancelled'); e.cancelled = true; return e; }
-
 function reportError(err) {
-  if (err && err.cancelled) return;
   toast((err && err.message) || 'Ndodhi nje gabim', 'error');
-}
-
-function logout() {
-  apiRequest('POST', '/api/logout').catch(function(){}).then(function() {
-    setLoggedIn(false);
-    toast('Dole nga llogaria', 'info');
-  });
 }
 
 // DIALOG
@@ -1349,25 +1284,22 @@ function withSaving(p) {
 
 function saveAsNewTemplate() {
   if (saving) return;
-  ensureLoggedIn().then(function(ok) {
-    if (!ok) return;
-    return showDialog({
-      title: '💾 Ruaj shabllonin',
-      message: 'Emri i shabllonit:',
-      input: { value: suggestedName(), placeholder: 'p.sh. Antalya Qershor', maxLength: 120 },
-      okText: 'Ruaj',
-      onOk: function(name) {
-        if (!name) throw new Error('Shkruaj nje emer.');
-        return name;
-      }
-    }).then(function(name) {
-      if (name === null) return;
-      return withSaving(ensureHostedImages().then(function() {
-        return authed(function(){ return apiRequest('POST', '/api/templates', { name: name, data: getFormState() }); });
-      })).then(function(res) {
-        markSaved(res.template);
-        toast('Shablloni u ruajt', 'success');
-      });
+  showDialog({
+    title: '💾 Ruaj shabllonin',
+    message: 'Emri i shabllonit:',
+    input: { value: suggestedName(), placeholder: 'p.sh. Antalya Qershor', maxLength: 120 },
+    okText: 'Ruaj',
+    onOk: function(name) {
+      if (!name) throw new Error('Shkruaj nje emer.');
+      return name;
+    }
+  }).then(function(name) {
+    if (name === null) return;
+    return withSaving(ensureHostedImages().then(function() {
+      return apiRequest('POST', '/api/templates', { name: name, data: getFormState() });
+    })).then(function(res) {
+      markSaved(res.template);
+      toast('Shablloni u ruajt', 'success');
     });
   }).catch(reportError);
 }
@@ -1376,7 +1308,7 @@ function saveTemplateChanges() {
   if (saving || !currentTemplate) return;
   var tpl = currentTemplate;
   withSaving(ensureHostedImages().then(function() {
-    return authed(function(){ return apiRequest('PUT', '/api/templates/' + tpl.id, { name: tpl.name, data: getFormState() }); });
+    return apiRequest('PUT', '/api/templates/' + tpl.id, { name: tpl.name, data: getFormState() });
   })).then(function(res) {
     markSaved(res.template);
     toast('Ndryshimet u ruajtën', 'success');
@@ -1410,15 +1342,12 @@ var libSearchTimer = null;
 var libRequestSeq = 0;
 
 function openLibrary() {
-  ensureLoggedIn().then(function(ok) {
-    if (!ok) return;
-    document.getElementById('libModal').classList.add('open');
-    document.addEventListener('keydown', libKeyHandler);
-    var search = document.getElementById('libSearch');
-    search.value = '';
-    loadLibrary();
-    if (window.innerWidth > 768) setTimeout(function(){ search.focus(); }, 30);
-  });
+  document.getElementById('libModal').classList.add('open');
+  document.addEventListener('keydown', libKeyHandler);
+  var search = document.getElementById('libSearch');
+  search.value = '';
+  loadLibrary();
+  if (window.innerWidth > 768) setTimeout(function(){ search.focus(); }, 30);
 }
 
 function closeLibrary() {
@@ -1443,15 +1372,12 @@ function loadLibrary() {
   var q = document.getElementById('libSearch').value.trim();
   var seq = ++libRequestSeq;
   setLibState('<span class="spinner"></span>Duke ngarkuar...');
-  authed(function() {
-    return apiRequest('GET', '/api/templates' + (q ? '?q=' + encodeURIComponent(q) : ''));
-  }).then(function(res) {
+  apiRequest('GET', '/api/templates' + (q ? '?q=' + encodeURIComponent(q) : '')).then(function(res) {
     if (seq !== libRequestSeq) return;
     libTemplates = res.templates || [];
     renderLibrary(q);
   }).catch(function(err) {
     if (seq !== libRequestSeq) return;
-    if (err.cancelled) { closeLibrary(); return; }
     setLibState(esc(err.message || 'Gabim') + '<br><button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="loadLibrary()">Provo perseri</button>', 'error');
   });
 }
@@ -1498,7 +1424,7 @@ function openTemplate(id, asNew) {
   confirmDiscardChanges().then(function(ok) {
     if (!ok) return;
     toast('Duke hapur...', 'info');
-    return authed(function(){ return apiRequest('GET', '/api/templates/' + id); }).then(function(res) {
+    return apiRequest('GET', '/api/templates/' + id).then(function(res) {
       var t = res.template;
       setFormState(t.data);
       markSaved(asNew ? null : t);
@@ -1509,7 +1435,7 @@ function openTemplate(id, asNew) {
 }
 
 function duplicateTemplate(id) {
-  authed(function(){ return apiRequest('POST', '/api/templates/' + id + '/duplicate'); }).then(function() {
+  apiRequest('POST', '/api/templates/' + id + '/duplicate').then(function() {
     toast('Shablloni u dyfishua', 'success');
     loadLibrary();
   }).catch(reportError);
@@ -1524,7 +1450,7 @@ function renameTemplate(id) {
     okText: 'Ruaj',
     onOk: function(name) {
       if (!name) throw new Error('Shkruaj nje emer.');
-      return authed(function(){ return apiRequest('PUT', '/api/templates/' + id, { name: name }); });
+      return apiRequest('PUT', '/api/templates/' + id, { name: name });
     }
   }).then(function(res) {
     if (res === null) return;
@@ -1546,7 +1472,7 @@ function deleteTemplate(id) {
     okText: 'Fshi',
     danger: true,
     onOk: function() {
-      return authed(function(){ return apiRequest('DELETE', '/api/templates/' + id); });
+      return apiRequest('DELETE', '/api/templates/' + id);
     }
   }).then(function(res) {
     if (res === null) return;

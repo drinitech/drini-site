@@ -1,9 +1,7 @@
-import { requireAuth } from '../../_lib/auth.js';
 import { sql } from '../../_lib/db.js';
 import { isUuid, methodNotAllowed, sendError, sendJson, withErrors } from '../../_lib/http.js';
 
 export default withErrors(async (req, res) => {
-  if (!(await requireAuth(req, res))) return;
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
 
   const id = req.query.id;
