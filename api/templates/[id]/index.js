@@ -1,4 +1,3 @@
-import { requireAuth } from '../../_lib/auth.js';
 import { sql } from '../../_lib/db.js';
 import { isUuid, methodNotAllowed, readJsonBody, sendError, sendJson, withErrors } from '../../_lib/http.js';
 import { heroUrlFrom, validateData, validateName } from '../../_lib/templates.js';
@@ -6,8 +5,6 @@ import { heroUrlFrom, validateData, validateName } from '../../_lib/templates.js
 const NOT_FOUND = 'Shablloni nuk u gjet.';
 
 export default withErrors(async (req, res) => {
-  if (!(await requireAuth(req, res))) return;
-
   const id = req.query.id;
   if (!isUuid(id)) return sendError(res, 404, NOT_FOUND);
 

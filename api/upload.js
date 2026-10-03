@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { put } from '@vercel/blob';
-import { requireAuth } from './_lib/auth.js';
 import { methodNotAllowed, sendError, sendJson, withErrors } from './_lib/http.js';
 
 // Note: Vercel caps function request bodies at ~4.5 MB, so the client compresses first.
@@ -24,7 +23,6 @@ async function readRaw(req, limit) {
 }
 
 export default withErrors(async (req, res) => {
-  if (!(await requireAuth(req, res))) return;
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST']);
 
   const contentType = String(req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();

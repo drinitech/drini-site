@@ -1,11 +1,8 @@
-import { requireAuth } from '../_lib/auth.js';
 import { sql } from '../_lib/db.js';
 import { methodNotAllowed, readJsonBody, sendJson, withErrors } from '../_lib/http.js';
 import { heroUrlFrom, validateData, validateName } from '../_lib/templates.js';
 
 export default withErrors(async (req, res) => {
-  if (!(await requireAuth(req, res))) return;
-
   if (req.method === 'GET') {
     const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 120) : '';
     // Escape LIKE wildcards so the search is a plain substring match.
