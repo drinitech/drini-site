@@ -1,7 +1,7 @@
 # Drini Travel – Gjenerator Emailesh
 
 Ndërtues ofertash për email (HTML/CSS/JS i thjeshtë) me backend në Vercel Functions + Neon Postgres
-për ruajtjen e shablloneve. Live: https://drini-offers.vercel.app
+për ruajtjen e shablloneve. Live: [drini-offers.vercel.app](https://drini-offers.vercel.app)
 
 ## Struktura
 
